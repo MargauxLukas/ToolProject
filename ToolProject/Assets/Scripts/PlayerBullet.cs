@@ -5,26 +5,37 @@ using UnityEngine;
 public class PlayerBullet : MonoBehaviour
 {
     public float speed;
-    // Start is called before the first frame update
+    public bool move = false;
+    public bool isShot = false;
+
     void Start()
     {
 
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (move)
+        {
+            Vector2 pos = transform.position;
+            pos = new Vector2(pos.x, pos.y + speed * Time.fixedDeltaTime);
+            transform.position = pos;
+
+            Vector2 max = Camera.main.ViewportToWorldPoint(new Vector2(1, 1));
+            if (transform.position.y > max.y) BulletReset();                  //later make it move to it start pos
+        }   
     }
 
     public void BulletMove()
     {
-        Vector2 pos = transform.position;
-        pos = new Vector2(pos.x, pos.y + speed * Time.fixedDeltaTime);
-        transform.position = pos;
+        move = true;
+    }
 
-        Vector2 max = Camera.main.ViewportToWorldPoint(new Vector2(1, 1));
+    public void BulletReset()
+    {
+        transform.position = Vector2.zero;
+        move = false;
 
-        if (transform.position.y > max.y) Destroy(gameObject);      //later make it move to it start pos
+        transform.position = BulletManager.instance.transform.position;
     }
 }
