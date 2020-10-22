@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpaceshipMovement : MonoBehaviour
+public class SpaceshipBehavior : MonoBehaviour
 {
     public float speed;
     public float spriteOffset;
+    Vector2 direction;
+
+    public int life;
 
     void Start()
     {
@@ -15,7 +18,9 @@ public class SpaceshipMovement : MonoBehaviour
     void FixedUpdate()
     {
         float x = Input.GetAxisRaw("Horizontal");
-        Vector2 direction = new Vector2(x, 0).normalized;
+
+        direction = new Vector2(x, 0).normalized;
+
         Move(direction);
     }
 
@@ -34,5 +39,10 @@ public class SpaceshipMovement : MonoBehaviour
         pos.x = Mathf.Clamp(pos.x, min.x, max.x);
 
         transform.position = pos;
+    }
+
+    public void LoseLife()
+    {
+
     }
 }

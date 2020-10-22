@@ -7,8 +7,11 @@ public class BulletManager : MonoBehaviour
     public static BulletManager instance;
 
     public Transform hiddenSpawn;
-    public Transform[] bulletSpawns;
+    public Transform bulletSpawn;
     public PlayerBullet[] playerBullets;
+
+    public bool pressed;
+    public float delay;
 
     private void Awake()
     {
@@ -22,22 +25,31 @@ public class BulletManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space) && !pressed)
         {
-            for (int i = 0; i < playerBullets.Length; i = i + 2)
+            pressed = true;
+            ShootBullet();
+            StartCoroutine(AddDelay());
+        }
+    }
+
+    void ShootBullet()
+    {
+        foreach(PlayerBullet bullet in playerBullets)
+        {
+            if (!bullet.isShot)
             {
-                ShootBullet(playerBullets[i], playerBullets[i+1]);
+                bullet.isShot = true;
+                bullet.transform.position = bulletSpawn.transform.position;
+                bullet.gameObject.SetActive(true);
+                return;
             }
         }
     }
 
-    IEnumerator ShootBullet(PlayerBullet leftBullet, PlayerBullet rightBullet)
+    IEnumerator AddDelay()
     {
-        leftBullet.transform.position = bulletSpawns[0].transform.position;
-        leftBullet.BulletMove();
-        rightBullet.transform.position = bulletSpawns[1].transform.position;
-        rightBullet.BulletMove();
-
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(delay);
+        pressed = false;
     }
 }
