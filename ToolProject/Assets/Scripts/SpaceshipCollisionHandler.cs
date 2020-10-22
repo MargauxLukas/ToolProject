@@ -6,16 +6,11 @@ public class SpaceshipCollisionHandler : MonoBehaviour
 {
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.name.Contains("Bullet"))
+        if (collision.gameObject.name.Contains("Spaceship"))
         {
-            if (gameObject.name.Contains("Player"))
-            {
-                gameObject.GetComponent<SpaceshipBehavior>().LoseLife();
-            }
-            else if (gameObject.name.Contains("Enemy"))
-            {
-                gameObject.GetComponent<EnemyBehavior>().LoseLife();
-            }
+            Debug.Log("pouet");
+            Destroy(gameObject);
+            collision.gameObject.GetComponent<EnemyBehavior>().ResetEnemy();
         }
     }
 }

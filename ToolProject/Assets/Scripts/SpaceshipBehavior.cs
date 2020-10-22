@@ -12,7 +12,7 @@ public class SpaceshipBehavior : MonoBehaviour
 
     void Start()
     {
-        
+
     }
 
     void FixedUpdate()
@@ -43,6 +43,12 @@ public class SpaceshipBehavior : MonoBehaviour
 
     public void LoseLife()
     {
+        life--;
 
+        if (life <= 0)
+        {
+            Destroy(gameObject);
+        }
+        Debug.Log("Lose life, Your life is now : " + life);
     }
 }

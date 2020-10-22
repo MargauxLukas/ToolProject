@@ -58,10 +58,16 @@ public class EnemyBehavior : MonoBehaviour
 
     public void LoseLife()
     {
+        life--;
 
+        if(life <= 0)
+        {
+            ResetEnemy();
+        }
+        Debug.Log("Gain Points, Enemy life is now : " + life);
     }
 
-    void ResetEnemy()
+    public void ResetEnemy()
     {
         transform.position = EnemiesManager.instance.hiddenSpawn.transform.position;
         isUsed = false;

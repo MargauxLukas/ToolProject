@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class WallCollisionHandler : MonoBehaviour
 {
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.name.Contains("Player"))
+        if (collision.gameObject.name.Contains("Player Spaceship"))
         {
             Destroy(collision.gameObject);
             //timeset 0
