@@ -9,6 +9,9 @@ public class LevelEditorInspector : Editor
 {
     LevelEditor currentLevel;
 
+    SerializedProperty enemiesColor_s;
+    SerializedProperty wallsColor_s;
+
     public int[,] buttonType = new int[LevelEditor.lines, LevelEditor.columns];
     public int button;
     public string levelName;
@@ -20,6 +23,10 @@ public class LevelEditorInspector : Editor
 
         currentLevel.levelOrigin = Object.FindObjectOfType<LevelOriginPointer>().transform;
         currentLevel.AssignAssetsPositions();
+        currentLevel.assetSpacing = 1.48f;
+
+        enemiesColor_s = serializedObject.FindProperty(nameof(LevelEditor.enemiesColor));
+        wallsColor_s = serializedObject.FindProperty(nameof(LevelEditor.wallsColor));
 
         for (int i = 0; i < LevelEditor.lines; i++)
         {
@@ -33,7 +40,9 @@ public class LevelEditorInspector : Editor
     public override void OnInspectorGUI()
     {
         Color oldColor = GUI.color;
+        float oldLabel = EditorGUIUtility.labelWidth;
 
+        #region Draw Enemies/Walls Buttons
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Enemies"))
         {
@@ -44,14 +53,29 @@ public class LevelEditorInspector : Editor
         {
             button = 1;
         }
+        EditorGUILayout.EndHorizontal();
+        #endregion
 
+        #region Draw Enemies/Walls Colors
+        //EditorGUIUtility.labelWidth /= 2000;
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.PropertyField(enemiesColor_s, GUIContent.none) ;
+        EditorGUILayout.PropertyField(wallsColor_s, GUIContent.none);
+        EditorGUILayout.EndHorizontal();
+        //EditorGUIUtility.labelWidth = oldLabel;
+        #endregion
+
+        #region Draw Erase Button
+        EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Erase"))
         {
             button = 0;
         }
         EditorGUILayout.EndHorizontal();
+        #endregion
 
-        for (int i = LevelEditor.lines - 1; i >= 0; i--)
+        #region Draw Level Editor Tab
+        for (int i = 0 ; i < LevelEditor.lines; i++)
         {
             EditorGUILayout.BeginHorizontal();
             for (int j = 0; j < LevelEditor.columns; j++)
@@ -76,13 +100,15 @@ public class LevelEditorInspector : Editor
                     switch (button)
                     {
                         case 0:
+                            currentLevel.DeleteGameObject(i, j, button);
                             break;
 
                         case 1:
-                            currentLevel.NullCheck(i, j);
+                            currentLevel.NullCheckWalls(i, j);
                             break;
 
                         case 2:
+                            currentLevel.NullCheckEnemies(i, j);
                             break;
                     }
 
@@ -91,23 +117,25 @@ public class LevelEditorInspector : Editor
             }
             EditorGUILayout.EndHorizontal();
         }
+        GUI.color = oldColor;
+        #endregion
 
+        #region Draw Level Origin Transform Field
         EditorGUILayout.BeginHorizontal();
-
         Transform lvlOriginTransform = EditorGUILayout.ObjectField("Set Level Origin", currentLevel.levelOrigin, typeof(Transform), true) as Transform;
-
         EditorGUILayout.EndHorizontal();
+        #endregion
 
+        #region Draw Level Name/Save Fields
         EditorGUILayout.BeginHorizontal();
-
         name = EditorGUILayout.TextField("Enter Level Name", name);
 
         if(GUILayout.Button("Save Level"))
         {
             currentLevel.SaveLevel(name);
         }
-
         EditorGUILayout.EndHorizontal();
+        #endregion
     }
 
     private void OnDisable()
