@@ -9,21 +9,23 @@ public class LevelEditorInspector : Editor
 {
     LevelEditor currentLevel;
 
-    public Color[,] colorList = new Color[LevelEditor.lines, LevelEditor.columns];
-
-    public bool enemiesButton = false;
-    public bool wallsButton = false;
-    public bool eraseButton = false;
+    public int[,] buttonType = new int[LevelEditor.lines, LevelEditor.columns];
+    public int button;
+    public string levelName;
 
     private void OnEnable()
     {
+        //levelOrigin = serializedObject.FindProperty(nameof(LevelEditor.levelOrigin));
         currentLevel = (target as LevelEditor);
+
+        currentLevel.levelOrigin = Object.FindObjectOfType<LevelOriginPointer>().transform;
+        currentLevel.AssignAssetsPositions();
 
         for (int i = 0; i < LevelEditor.lines; i++)
         {
             for (int j = 0; j < LevelEditor.columns; j++)
             {
-                colorList[i, j] = Color.white;
+                buttonType[i, j] = 0;
             }
         }
     }
@@ -35,85 +37,75 @@ public class LevelEditorInspector : Editor
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Enemies"))
         {
-            enemiesButton = true;
-            wallsButton = false;
-            eraseButton = false;
+            button = 2;
         }
 
         if (GUILayout.Button("Walls"))
         {
-            wallsButton = true;
-            enemiesButton = false;
-            eraseButton = false;
+            button = 1;
         }
 
         if (GUILayout.Button("Erase"))
         {
-            eraseButton = true;
-            wallsButton = false;
-            enemiesButton = false;
+            button = 0;
         }
         EditorGUILayout.EndHorizontal();
 
-        for (int i = 0; i < LevelEditor.lines; i++)
+        for (int i = LevelEditor.lines - 1; i >= 0; i--)
         {
             EditorGUILayout.BeginHorizontal();
             for (int j = 0; j < LevelEditor.columns; j++)
             {
-                GUI.color = colorList[i, j];
+                switch (buttonType[i,j])
+                {
+                    case 0:
+                        GUI.color = Color.white;
+                        break;
+
+                    case 1:
+                        GUI.color = Color.black;
+                        break;
+
+                    case 2:
+                        GUI.color = Color.red;
+                        break;
+                }
 
                 if (GUILayout.Button(""))
                 {
-                    if(colorList[i,j] == Color.white)
+                    switch (button)
                     {
-                        if (wallsButton)
-                        {
-                            colorList[i, j] = Color.black;
-                            currentLevel.CreateLevelWalls(i, j);
-                        }
+                        case 0:
+                            break;
 
-                        if (enemiesButton)
-                        {
-                            colorList[i, j] = Color.red;
-                        }
+                        case 1:
+                            currentLevel.NullCheck(i, j);
+                            break;
 
-                        if (eraseButton)
-                        {
-                            colorList[i, j] = Color.white;
-                        }
+                        case 2:
+                            break;
                     }
-                    else
-                    {
-                        if (wallsButton && colorList[i, j] == Color.black)
-                        {
-                            colorList[i, j] = Color.white;
-                        }
-                        else if (wallsButton && colorList[i, j] != Color.black)
-                        {
-                            colorList[i, j] = Color.black;
-                            currentLevel.CreateLevelWalls(i, j);
-                        }
 
-                        if (enemiesButton && colorList[i, j] == Color.red)
-                        {
-                            colorList[i, j] = Color.white;
-                        }
-                        else if (enemiesButton && colorList[i, j] != Color.red)
-                        {
-                            colorList[i, j] = Color.red;
-                        }
-
-                        if (eraseButton)
-                        {
-                            colorList[i, j] = Color.white;
-                        }
-                    }
+                    buttonType[i, j] = button;
                 }
             }
             EditorGUILayout.EndHorizontal();
         }
 
         EditorGUILayout.BeginHorizontal();
+
+        Transform lvlOriginTransform = EditorGUILayout.ObjectField("Set Level Origin", currentLevel.levelOrigin, typeof(Transform), true) as Transform;
+
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+
+        name = EditorGUILayout.TextField("Enter Level Name", name);
+
+        if(GUILayout.Button("Save Level"))
+        {
+            currentLevel.SaveLevel(name);
+        }
 
         EditorGUILayout.EndHorizontal();
     }
